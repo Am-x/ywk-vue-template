@@ -6,7 +6,7 @@
             <span>手机号</span>
             <el-input v-model="phoneNum" placeholder="手机号"></el-input>
             <span>收货地址</span>
-            <el-input v-model="address" placeholder="收货地址"></el-input>
+            <el-input v-model="address" placeholder="收货地址" type="textarea"></el-input>
             <div class="change-btn">
                 <el-button type="primary" @click="update">修改</el-button>
             </div>
