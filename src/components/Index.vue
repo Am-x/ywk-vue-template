@@ -4,8 +4,8 @@
         <aside :class="asideClassName">
             <!-- logo -->
             <div class="logo-c">
-                <img src="../assets/imgs/logo.png" alt="logo" class="logo">
-                <span v-show="isShowAsideTitle">后台管理系统</span>
+                <img src="../assets/imgs/sc.jpg" alt="logo" class="logo" >
+                <span v-show="isShowAsideTitle">商城</span>
             </div>
             <!-- 菜单栏 -->
             <Menu class="menu" ref="asideMenu" theme="dark" width="100%" @on-select="selectMenuCallback"
@@ -95,7 +95,17 @@
                         </div>
                         <!-- 用户头像 -->
                         <div class="user-img-c">
-                            <img :src="userImg">
+                            <div class="demo-type">
+                                <div>
+                                    <el-avatar icon="el-icon-user-solid"></el-avatar>
+                                </div>
+                                <div>
+                                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                                </div>
+                                <div>
+                                    <el-avatar> user </el-avatar>
+                                </div>
+                            </div>
                         </div>
                         <!-- 下拉菜单 -->
                         <Dropdown trigger="click" @on-click="userOperate" @on-visible-change="showArrow">
@@ -438,7 +448,7 @@ export default {
                     }
                 }
             } else if (name != this.home) {
-                // 如果没有标签则跳往首页
+                // 如果没有标签则跳往首页·
                 this.gotoPage(this.home)
             } else {
                 this.reloadPage()

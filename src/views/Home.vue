@@ -1,10 +1,5 @@
 <template>
     <div class="home-container">
-        <el-switch
-            v-model="value"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-        </el-switch>
         <div class="home-content">
             <Button @click="getUserData">ajax 测试</Button>
 
@@ -22,7 +17,6 @@ export default {
     data() {
         return {
             userInfo: '',
-            value: true,
         }
     },
     methods: {

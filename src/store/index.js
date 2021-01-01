@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+// 全局参数
 const store = new Vuex.Store({
     state: {
         isShowLoading: false, // 全局 loading

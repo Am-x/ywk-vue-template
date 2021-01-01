@@ -57,6 +57,12 @@ export const asyncRoutes = {
         meta: { title: '用户信息' },
         component: () => import('../views/UserInfo.vue'),
     },
+    gooddetail: {
+        path: 'gooddetail',
+        name: 'gooddetail',
+        meta: { title: '用户信息' },
+        component: () => import('../views/GoodDetail.vue'),
+    },
 }
 
 const createRouter = () => new Router({
