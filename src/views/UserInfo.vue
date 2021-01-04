@@ -21,7 +21,8 @@ export default {
     data() {
         return {
             userName:'',
-            phoneNum:'',            address:'',
+            phoneNum:'',
+            address:'',
         }
     },
     mounted() {
@@ -40,6 +41,7 @@ export default {
     },
     computed: {
         update(){
+            const that=this
             axios({
                 method: 'post',
                 url: '/goods/to_list',
