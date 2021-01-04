@@ -15,9 +15,10 @@
                 </el-table-column>
                 <el-table-column label="商品图片" min-width="20%">
                     <template slot-scope="scope">
-                        <img :src="require(`@/assets/imgs/${scope.row.goodsImg}`)" alt="这是图片" height="70" />
+                        <img :src="require(scope.row.goodsImg)" :fit="fill" alt="这是图片"  min-width="70" height="70" />
                     </template>
                     <!--<img src="@/assets/imgs/iphonex.png" min-width="70" height="70"/>-->
+                </el-table-column>
                 </el-table-column>
                 <el-table-column prop="goodsPrice" label="商品原价" min-width="16%">
                 </el-table-column>

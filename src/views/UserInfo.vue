@@ -21,8 +21,7 @@ export default {
     data() {
         return {
             userName:'',
-            phoneNum:'',
-            address:'',
+            phoneNum:'',            address:'',
         }
     },
     mounted() {

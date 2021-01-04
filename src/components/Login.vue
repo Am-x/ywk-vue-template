@@ -54,7 +54,7 @@
 
 <script>
     import md5 from 'js-md5';
-    import axios from 'axios';
+    import request from '@/utils/request'
     import identify from './identify.vue';
 
 export default {
@@ -152,38 +152,34 @@ export default {
                         that.$message.error('验证码错误');
                         that.refreshCode();
                     } else {
-                        axios({
-                            method: 'post',
-                            url: '/login/do_login',
-                            data: {
-                                mobile: this.loginForm.account,
-                                password: password
-                            }
+                        this.$request.post('/login/do_login',{
+                            mobile: this.loginForm.account,
+                            password: password
                         }).then(function (response) {
-                            console.log(response);
-                            if (response.data.code == 0) {
+                            console.log(response)
+                            if (response.code == 0) {
                                 that.isShowLoading = true
-                                console.log("success!!!");
-                                details = response.data.data;
+                                console.log("success!!!")
+                                details = response.data
                                 // 登陆成功 设置用户信息
-                                localStorage.setItem('userImg', '../assets/imgs/user.jpg');
-                                localStorage.setItem('userName', details.name);
-                                localStorage.setItem('token', details.token);
-                                localStorage.setItem('address', details.address);
-                                localStorage.setItem('phoneNum', details.phoneNum);
+                                localStorage.setItem('userImg', '../assets/imgs/user.jpg')
+                                localStorage.setItem('userName', details.name)
+                                localStorage.setItem('token', details.token)
+                                localStorage.setItem('address', details.address)
+                                localStorage.setItem('phoneNum', details.phoneNum)
                                 // 登陆成功 假设这里是后台返回的 token
                                 that.$message("登陆成功")
 
-                                that.$router.push({name: 'home'});
+                                that.$router.push({name: 'home'})
                             } else {
-                                console.log("false!!!");
-                                that.$message(response.data.msg);
+                                console.log("false!!!")
+                                that.$message(response.msg)
                             }
                         }).catch(function (error) {
                             console.log(error);
                             console.log("false!!!");
-                            that.$layer.msg(error.data.msg);
-                        });
+                            that.$layer.msg(error.msg);
+                        })
                     }
                 }else {
                     console.log('error submit!!');
