@@ -6,8 +6,8 @@
                 <div v-if="errorInfo" style="margin-bottom: 5px;">
                     <span>{{errInfo}}</span>
                 </div>
-                <el-form-item prop="account">
-                    <el-input v-model="loginForm.account" placeholder="账号"></el-input>
+                <el-form-item prop="mobile">
+                    <el-input v-model="loginForm.mobile" placeholder="账号"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input placeholder="密码" v-model="loginForm.password" show-password></el-input>
@@ -30,8 +30,8 @@
                 <div v-if="errorInfo" style="margin-bottom: 5px;">
                     <span>{{errInfo}}</span>
                 </div>
-                <el-form-item prop="account">
-                    <el-input v-model="registerForm.account" placeholder="账号" autocomplete="off"></el-input>
+                <el-form-item prop="mobile">
+                    <el-input v-model="registerForm.mobile" placeholder="账号" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input placeholder="密码" v-model="registerForm.password" show-password
@@ -54,7 +54,6 @@
 
 <script>
     import md5 from 'js-md5';
-    import request from '@/utils/request'
     import identify from './identify.vue';
 
 export default {
@@ -64,21 +63,20 @@ export default {
     data() {
         return {
             showLogin: true,
-            isShowLoading: false,
             bg: {},
             loginForm:{
-                account: '',
+                mobile: '',
                 password: '',
                 validate:'',
             },
             registerForm:{
-                account: '',
+                mobile: '',
                 password: '',
                 rePassword:'',
                 validate:'',
             },
             rules: {
-                account: [
+                mobile: [
                     {required: true, message: '请输入账号', trigger: 'blur'}
                 ],
                 password: [
@@ -103,6 +101,7 @@ export default {
         this.makeCode(this.identifyCodes, 4);
     },
     created() {
+        //页面加载时机执行
         this.bg.backgroundImage = 'url(' + require('../assets/imgs/bg0' + new Date().getDay() + '.jpg') + ')'
     },
     watch: {
@@ -137,48 +136,47 @@ export default {
             return Math.floor(Math.random() * (max - min) + min);
         },
         submit(loginForm) {
-            const that = this;
-            var inputPass = this.loginForm.password;
-            var salt = "1a2b3c4d";
-            var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass + salt.charAt(5) + salt.charAt(4);
-            var password = md5(str);
-            // console.log(this.account+password);
-            var details;
+            const that = this
+            var inputPass = this.loginForm.password
+            var salt = "1a2b3c4d"
+            var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass + salt.charAt(5) + salt.charAt(4)
+            var password = md5(str)
+            // console.log(this.loginForm.mobile+password)
+            var details
+            var cookies
             that.$refs[loginForm].validate((valid) => {
                 if (valid) {
                     if (that.loginForm.validate != this.identifyCode) {
-                        that.errorInfo = true;
-                        that.errInfo = '验证码错误';
-                        that.$message.error('验证码错误');
-                        that.refreshCode();
+                        that.errorInfo = true
+                        that.errInfo = '验证码错误'
+                        that.$message.error('验证码错误')
+                        that.refreshCode()
                     } else {
-                        this.$request.post('/login/do_login',{
-                            mobile: this.loginForm.account,
+                        this.$request.post('/api/login/do_login',{
+                            mobile: this.loginForm.mobile,
                             password: password
                         }).then(function (response) {
                             console.log(response)
+                            console.log(document.cookie)
                             if (response.code == 0) {
-                                that.isShowLoading = true
                                 console.log("success!!!")
                                 details = response.data
                                 // 登陆成功 设置用户信息
-                                localStorage.setItem('userImg', '../assets/imgs/user.jpg')
+                                localStorage.setItem('userImg', 'user.jpg')
                                 localStorage.setItem('userName', details.name)
-                                localStorage.setItem('token', details.token)
                                 localStorage.setItem('address', details.address)
                                 localStorage.setItem('phoneNum', details.phoneNum)
-                                // 登陆成功 假设这里是后台返回的 token
+                                localStorage.setItem('token', details.token)
                                 that.$message("登陆成功")
-
-                                that.$router.push({name: 'home'})
+                                that.$router.push({ name: 'home'  })
                             } else {
                                 console.log("false!!!")
                                 that.$message(response.msg)
                             }
                         }).catch(function (error) {
                             console.log(error);
-                            console.log("false!!!");
-                            that.$layer.msg(error.msg);
+                            console.log("false!!!")
+                            that.$layer.msg(error.msg)
                         })
                     }
                 }else {
@@ -197,32 +195,25 @@ export default {
                 var salt = "1a2b3c4d"
                 var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass + salt.charAt(5) + salt.charAt(4)
                 var password = md5(str)
-                axios({
-                    method: 'post',
-                    url: '/login/register',
-                    data: {
-                        mobile: this.registerForm.account,
-                        password: password
-                    }
+                this.$request.post('/api/login/register',{
+                    mobile: this.registerForm.mobile,
+                    password: password
                 }).then(function (response) {
                     console.log(response);
-                    if (response.data.code == 0) {
-                        that.isShowLoading = true
+                    if (response.code == 0) {
                         console.log("success!!!")
                         that.$message("注册成功");
                         showChange()
                     } else {
                         console.log("false!!!");
-                        that.$message(response.data.msg);
+                        that.$message(response.msg);
                     }
                 }).catch(function (error) {
                     console.log(error);
                     console.log("false!!!");
-                    that.$layer.msg(error.data.msg);
-                });
+                    that.$message.msg(error.msg);
+                })
             }
-
-
         },
         forgetPwd() {
 

@@ -15,7 +15,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
 export default {
     name: 'userinfo',
     data() {
@@ -25,7 +24,8 @@ export default {
             address:'',
         }
     },
-    mounted() {
+    created(){
+        //页面加载时就从本地通过localstorage获取存储值
         this.userName=""
         this.phoneNum=""
         this.address=""
@@ -39,28 +39,35 @@ export default {
             this.address=localStorage.getItem('address')
         }
     },
-    computed: {
+    mounted() {
+
+    },
+    methods: {
         update(){
             const that=this
-            axios({
-                method: 'post',
-                url: '/goods/to_list',
-                data: {}
+            var detail
+            this.$request.post('/api/user/modifyUserInfo',{
+                name:this.userName,
+                phoneNum:this.phoneNum,
+                address:this.address
             }).then(function (response) {
                 console.log(response)
-                if (response.data.code == 0) {
+                if (response.code == 0) {
                     that.isShowLoading = true
                     console.log("success!!!")
-                    that.tableData = response.data.data
-
+                    detail = response.data
+                    localStorage.setItem('userName',detail.name)
+                    localStorage.setItem('phoneNum',detail.phoneNum)
+                    localStorage.setItem('address',detail.address)
+                    that.$message("修改成功")
                 } else {
                     console.log("false!!!")
-                    that.$message(response.data.msg)
+                    that.$message(response.msg)
                 }
             }).catch(function (error) {
                 console.log(error)
                 console.log("false!!!")
-                that.$layer.msg(error.data.msg)
+                that.$layer.msg(error.msg)
             })
         }
     },

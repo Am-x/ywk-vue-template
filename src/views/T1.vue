@@ -15,7 +15,7 @@
                 </el-table-column>
                 <el-table-column label="商品图片" min-width="20%">
                     <template slot-scope="scope">
-                        <img :src="require(`@/assets/imgs/${scope.row.goodsImg}" :fit="fill" alt="这是图片"  min-width="70" height="70" />
+                        <img :src="require(`@/assets/imgs/${scope.row.goodsImg}`)" :fit="fill" alt="这是图片"  min-width="70" height="70" />
                     </template>
                     <!--<img src="@/assets/imgs/iphonex.png" min-width="70" height="70"/>-->
                 </el-table-column>
@@ -38,7 +38,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
 export default {
     name: 't1',
     data() {
@@ -53,25 +52,21 @@ export default {
     methods:{
         getGoodsList() {
             const that = this;
-            axios({
-                method: 'post',
-                url: '/goods/to_list',
-                data: {}
-            }).then(function (response) {
+            this.$request.get('/api/goods/to_list').then(function (response) {
                 console.log(response)
-                if (response.data.code == 0) {
+                if (response.code == 0) {
                     that.isShowLoading = true
                     console.log("success!!!")
-                    that.tableData = response.data.data
+                    that.tableData = response.data
 
                 } else {
                     console.log("false!!!")
-                    that.$message(response.data.msg)
+                    that.$message(response.msg)
                 }
             }).catch(function (error) {
                 console.log(error)
                 console.log("false!!!")
-                that.$layer.msg(error.data.msg)
+                that.$layer.msg(error.msg)
             })
         },
         detail(goodsid) {
