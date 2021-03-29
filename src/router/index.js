@@ -11,7 +11,7 @@ const commonRoutes = [
         component: () => import('../components/Login.vue'),
     },
     {
-        path: '/other', // 点击侧边栏跳到一个单独的路由页面，需要定义，层级和其他顶级路由一样
+        path: '/other', // 点击侧边栏跳到一个单独的路由页面，需要定义，层级和样其他顶级路由一
         name: 'other',
         meta: { title: '单独的路由' },
         component: () => import('../views/Other.vue'),
@@ -57,11 +57,11 @@ export const asyncRoutes = {
         meta: { title: '用户信息' },
         component: () => import('../views/UserInfo.vue'),
     },
-    gooddetail: {
-        path: 'gooddetail',
-        name: 'gooddetail',
-        meta: { title: '用户信息' },
-        component: () => import('../views/GoodDetail.vue'),
+    orderdetail: {
+        path: 'orderdetail',
+        name: 'orderdetail',
+        meta: { title: '订单详情' },
+        component: () => import('../views/Orderdetail.vue'),
     },
 }
 

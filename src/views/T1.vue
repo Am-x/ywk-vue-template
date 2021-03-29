@@ -1,88 +1,209 @@
 <template>
-    <div style="padding: 10px">
-        <div style="background: #fff; border-radius: 8px; padding: 20px;">
-            <div class="query-c">
-                查询：
-                <Input search placeholder="请输入查询内容" style="width: auto" />
-            </div>
-            <br>
-            <!--<Table max-height="670" border stripe :columns="columns1" :data="data1"></Table>-->
-            <el-table
-                :data="tableData"
-                border
-                style="width: 100%">
-                <el-table-column fixed prop="goodsName" label="商品名称" min-width="16%">
-                </el-table-column>
-                <el-table-column label="商品图片" min-width="20%">
-                    <template slot-scope="scope">
-                        <img :src="require(`@/assets/imgs/${scope.row.goodsImg}`)" :fit="fill" alt="这是图片"  min-width="70" height="70" />
-                    </template>
-                    <!--<img src="@/assets/imgs/iphonex.png" min-width="70" height="70"/>-->
-                </el-table-column>
-                <el-table-column prop="goodsPrice" label="商品原价" min-width="16%">
-                </el-table-column>
-                <el-table-column prop="miaoshaPrice" label="秒杀价" min-width="16%">
-                </el-table-column>
-                <el-table-column prop="stockCount" label="库存数量" min-width="16%">
-                </el-table-column>
-                <el-table-column fixed="right" label="操作" min-width="16%">
-                    <template width="40" slot-scope="scope">
-                        <el-button @click="detail(scope.row.id)" type="text">详情</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <br>
-            <Page :total="100" show-sizer show-elevator/>
+    <div class="panel panel-default" >
+        <div class="panel-heading">秒杀商品详情</div>
+        <div class="panel-body">
+            <span id="userTip"> {{userTip}}<br/></span>
+            <span>{{isAddress}}</span>
         </div>
+        <table class="table" id="goodslist">
+            <tr>
+                <td>商品名称</td>
+                <td colspan="3" id="goodsName">{{goodsName}}</td>
+            </tr>
+            <tr>
+                <td>商品图片</td>
+                <td colspan="3"><img :src="require(`@/assets/imgs/${img}`)" width="200" height="200" /></td>
+            </tr>
+            <tr>
+                <td>秒杀开始时间：</td>
+                <td id="startTime">{{startTime}}</td>
+            </tr>
+            <tr>
+                <td >
+                    <input type="hidden" id="remainSeconds" />
+                    <span id="miaoshaTip">{{miaoshaTip}}</span>
+                </td>
+                <td>
+                    <!--
+                        <form id="miaoshaForm" method="post" action="/miaosha/do_miaosha">
+                            <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
+                            <input type="hidden" name="goodsId"  id="goodsId" />
+                        </form>-->
+                    <el-button class="btn btn-primary btn-block" type="button" id="buyButton" :disabled="isAble"  @click="doMiaosha">立即秒杀</el-button>
+                    <input type="hidden" name="goodsId"  id="goodsId" />
+                </td>
+            </tr>
+            <tr>
+                <td>商品原价</td>
+                <td colspan="3" id="goodsPrice">{{goodsPrice}}</td>
+            </tr>
+            <tr>
+                <td>秒杀价</td>
+                <td colspan="3"  id="miaoshaPrice">{{miaoshaPrice}}</td>
+            </tr>
+            <tr>
+                <td>库存数量</td>
+                <td colspan="3"  id="stockCount">{{stockCount}}</td>
+            </tr>
+        </table>
     </div>
 </template>
 
 <script>
-export default {
-    name: 't1',
-    data() {
-        return {
-            tableData:[],
-            goodsId:'',
+    import {formatDate} from '../utils/common.js';
+    export default {
+        data() {
+            return{
+                userTip:'',
+                isAddress:'',
+                goodsName:'',
+                img:'',
+                goodsImg:'',
+                startTime:'',
+                miaoshaTip:'',
+                goodsPrice:'',
+                miaoshaPrice:'',
+                stockCount:'',
+                isAble:true
+            }
+        },
+
+        mounted:function () {
+            this.getDetail();
+        },
+
+        methods:{
+            getDetail(){
+                const that=this
+                var goodsId=this.$route.query.goodsId
+                console.log(goodsId)
+                this.$request.get('/api/goods/detail?goodsId='+goodsId).then(function (response) {
+                    if(response.code==0){
+                        console.log(response)
+                        that.render(response.data)
+                    }
+                }).catch(function (error) {
+                    that.$message(error.msg)
+                })
+            },
+            render(detail){
+                const that = this
+                var miaoshaStatus = detail.miaoshaStatus
+                var  remainSeconds = detail.remainSeconds
+                var goods = detail.goods
+                var user = detail.user
+                var startTime=detail.startTime
+                if(user==null || user==''){
+                    that.userTip='您还没有登录，请登陆后再操作'
+                }
+                if(localStorage.getItem('address')=='' || localStorage.getItem('address')== null){
+                    that.address='没有收货地址的提示。。。'
+                }
+                that.goodsName=goods.goodsName
+                that.img=goods.goodsImg
+                that.startTime=detail.startTime
+                that.remainSeconds=remainSeconds
+                that.goodsId=goods.id
+                that.goodsPrice=goods.goodsPrice
+                that.miaoshaPrice=goods.miaoshaPrice
+                that.stockCount=goods.stockCount
+                that.countDown()
+            },
+            countDown() {
+                const that = this
+                clearTimeout(timeout)
+                var remainSeconds = that.remainSeconds
+                var timeout;
+                if (remainSeconds > 0) {//秒杀还没开始，倒计时
+                    that.isAble= true
+                    that.miaoshaTip='  秒杀倒计时：' + remainSeconds + '秒   '
+                    timeout = setTimeout(function () {
+                        that.remainSeconds=remainSeconds - 1
+                        that.countDown()
+                    }, 1000)
+                } else if (remainSeconds == 0) {//秒杀进行中
+                    that.isAble= false
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    that.miaoshaTip='秒杀进行中'
+                } else {//秒杀已经结束
+                    that.isAble=true
+                    that.miaoshaTip='秒杀已经结束'
+                }
+            },
+            doMiaosha() {
+                const that = this
+                this.$request.post("api/miaosha/do_miaosha",{
+                    goodsId:this.goodsId
+                }).then(function (response) {
+                    if (response.code == 0) {
+                        that.getMiaoshaResult(that.goodsId)
+                    }else {
+                        that.$message(response.msg)
+                    }
+                }).catch(function (error) {
+                    that.$layer.msg(error.msg)
+                })
+            },
+            getMiaoshaResult(goodsId) {
+                const that = this
+                clearTimeout(timeout)
+                var result
+                this.$request.get('api/miaosha/result?goodsId='+goodsId).then(function (response) {
+                    console.log(response)
+                    if (response.code == 0) {
+                        result = data.data
+                        console.log('orderId:'+result)
+                        if(result < 0){
+                            that.$message("对不起，抢购失败")
+                        }else if(result == 0){//继续轮询
+                            that.$message("正在抢购订单")
+                            timeout = setTimeout(function(){
+                                that.getMiaoshaResult(goodsId)
+                            }, 50)
+                        }else{
+                            that.$message('抢购成功')
+                            that.info()
+                        }
+                    }else{
+                        console.log(response.code)
+                        that.$message(response.msg)
+                    }
+                }).catch(function (error) {
+                    console.log(error.code)
+                    that.$message(error.msg)
+                })
+            },
+            info() {
+                const self = this
+                this.$Notice.info({
+                    title: `您有1条消息`,
+                    render(h) {
+                        return h('Button', {
+                            attrs: {
+                                type: 'info',
+                                size: 'small',
+                            },
+                            on: {
+                                click() {
+                                    // 点击查看跳转到消息页
+                                    self.gotoPage('msg')
+                                    self.hasNewMsg = false
+                                    self.msgNum = 0
+                                },
+                            },
+                        }, [
+                            '点击查看',
+                        ])
+                    },
+                })
+            },
         }
-    },
-    mounted:function() {
-        this.getGoodsList();
-    },
-    methods:{
-        getGoodsList() {
-            const that = this;
-            this.$request.get('/api/goods/to_list').then(function (response) {
-                console.log(response)
-                if (response.code == 0) {
-                    that.isShowLoading = true
-                    console.log("success!!!")
-                    that.tableData = response.data
-
-                } else {
-                    console.log("false!!!")
-                    that.$message(response.msg)
-                }
-            }).catch(function (error) {
-                console.log(error)
-                console.log("false!!!")
-                that.$layer.msg(error.msg)
-            })
-        },
-        detail(goodsid) {
-            const that = this;
-            that.$router.push({
-                name: 'gooddetail',
-                query: {
-                    goodsid:goodsid
-                }
-            })
-        },
     }
-}
 </script>
-
-
 <style scoped>
-
+    .table{
+        margin:auto 0;
+    }
 </style>

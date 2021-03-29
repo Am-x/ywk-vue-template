@@ -156,10 +156,8 @@ export default {
                             mobile: this.loginForm.mobile,
                             password: password
                         }).then(function (response) {
-                            console.log(response)
                             console.log(document.cookie)
                             if (response.code == 0) {
-                                console.log("success!!!")
                                 details = response.data
                                 // 登陆成功 设置用户信息
                                 localStorage.setItem('userImg', 'user.jpg')
@@ -170,7 +168,6 @@ export default {
                                 that.$message("登陆成功")
                                 that.$router.push({ name: 'home'  })
                             } else {
-                                console.log("false!!!")
                                 that.$message(response.msg)
                             }
                         }).catch(function (error) {

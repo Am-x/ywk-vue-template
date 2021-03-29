@@ -3,7 +3,7 @@
         <div class="container">
             <span>昵称</span>
             <el-input v-model="userName" placeholder="昵称"></el-input>
-            <span>手机号</span>
+                <span>手机号</span>
             <el-input v-model="phoneNum" placeholder="手机号"></el-input>
             <span>收货地址</span>
             <el-input v-model="address" placeholder="收货地址" type="textarea"></el-input>
@@ -54,20 +54,16 @@ export default {
                 console.log(response)
                 if (response.code == 0) {
                     that.isShowLoading = true
-                    console.log("success!!!")
                     detail = response.data
                     localStorage.setItem('userName',detail.name)
                     localStorage.setItem('phoneNum',detail.phoneNum)
                     localStorage.setItem('address',detail.address)
                     that.$message("修改成功")
                 } else {
-                    console.log("false!!!")
                     that.$message(response.msg)
                 }
             }).catch(function (error) {
-                console.log(error)
-                console.log("false!!!")
-                that.$layer.msg(error.msg)
+                that.$message(error.msg)
             })
         }
     },

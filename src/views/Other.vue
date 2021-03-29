@@ -5,6 +5,7 @@
             <Button @click="reback" type="primary" style="margin-left: 100px">返回</Button>
         </div>
     </div>
+
 </template>
 
 <script>
